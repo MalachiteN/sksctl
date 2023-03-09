@@ -1,0 +1,65 @@
+#!/bin/bash
+fhelp() {
+    echo "kdsy-writelist [OPTIONS] B|W MAC"
+    echo "将某个由MAC指定的设备加入黑/白名单"
+    echo "OPTIONS:"
+    echo "-i:	写入名单的模板编号。"
+    echo "	理论上 0 表示全部模板，1 到 5 表示 AC 本地模板，7 到 10 表示云模板。"
+    echo "-h:	显示帮助"
+    exit
+}
+fwarning() {
+	echo -e "\e[31m该请求直接操作数据库，可能造成自己或他人不能上网。 \e[0m"
+	echo -e "\e[31m目前的实验表明，写入名单是一次性的!\n写入后将不能删除，也不能写入其他名单，只能等待数据库重置! \e[0m"
+    echo -e "\e[31m你需要清楚地知道自己在做什么，所以必须提供一个选项。 \e[0m"
+}
+while getopts 'h' opt; do
+	case $opt in
+		?) fhelp ;;
+	esac
+done
+
+case $1 in
+	[Bb][Ll][Aa][Cc][Kk]|[Bb])
+		type='B'
+		color='黑'
+	;;
+
+	[Ww][Hh][Ii][Tt][Ee]|[Ww])
+		type='W'
+		color='白'
+	;;
+
+	*)
+		fwarning
+		fhelp
+	;;
+
+esac
+if [[ $2 == '' ]] ;then
+	echo '参数 MAC 缺失'
+	fhelp
+fi
+url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_add_user_auth_bw.sh?s='$(date +%s%3N)'&bw_type='$type'&mac='${2^^}'&intf='
+echo '请求地址: '$url'[0-8]'
+read -r -p '设备'$2'将被加入'$color'名单。确定继续吗？[Y/n] ' yn
+case $yn in
+	[Yy][Ee][Ss]|[Yy])
+	;;
+
+	[Nn][Oo]|[Nn])
+		echo '操作取消'
+		exit
+	;;
+
+	*)
+		fwarning
+		exit 1
+	;;
+
+esac
+for i in {0..8}
+do
+	result=`curl --silent $url$i |grep 'result' |sed 's/[[:space:]]*<[^>]*>//g'`
+	echo '模板 '$i $color'名单写入结果: '$result
+done

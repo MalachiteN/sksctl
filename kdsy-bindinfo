@@ -1,0 +1,77 @@
+#!/bin/bash
+fhelp() {
+	echo "kdsy-bindinfo [OPTIONS] ACCOUNT|MAC|USER_NAME"
+    echo "查询某个账号/设备MAC/用户姓名的设备绑定信息"
+    echo "OPTIONS:"
+    echo "-t account|mac|name:	查询类别"
+    echo "-s SIZE:		请求获取的数据条目数，默认为 3（一般每个用户的设备数上限即为 3 ）"
+    echo "-h:			显示帮助"
+    exit
+}
+url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0'
+declare -A types=(['account']='&user=' ['mac']='&mac=' ['name']='&ext_name=')
+while getopts 't:s:h' opt; do
+    case $opt in
+        t) typ=$OPTARG ;;
+        s) sz=$OPTARG ;;
+        h) fhelp ;;
+        ?) fhelp ;;
+    esac
+done
+shift $((OPTIND - 1))
+if [[ $1 == '' ]] ;then
+	fhelp
+fi
+if [[ $typ == 'account' ]] ;then
+    payload=$1
+elif [[ $typ == 'mac' ]] ;then
+    payload=`echo -n $1 |tr '[a-z]' '[A-Z]'`
+else
+	typ='name'
+	payload=`echo -n $1 |xxd -p -u |sed 's/[0-9A-Z]\{2\}/%&/g'`
+fi
+if [[ $sz == '' ]] ;then
+	sz=3
+fi
+url=$url${types[$typ]}$payload'&page_size='$sz
+echo '请求链接: '$url
+result=$(curl --silent $url |sed '1,/<row>/d' |grep 'type\|ip\|mac\|time\|et_i' |tr ' ' ',' |sed 's/[[:space:]]*<[^>]*>//g')
+titles=('登录状态' '设备MAC' 'IP' '用户所在模板' '认证时间' '会话过期时间')
+declare -A methods=(['A']='已认证' ['B']='黑名单' ['W']='白名单' ['E']='会话过期' ['C']='域间漫游' ['Q']='域间漫游(可授权)')
+i=0
+j=1
+for item in $result
+do
+    if ((i==0))
+    then
+        echo '第'$j'个设备'
+    fi
+    echo -n ${titles[i]}': '
+    if [[ $item == '' ]]
+    then
+        echo '暂无'
+    elif ((i==0))
+    then
+        echo ${methods[$item]}
+    else
+        echo `tr ',' ' ' <<< $item`
+    fi
+    ((i++))
+    if ((i==2))
+    then
+        vendor=$(grep `echo ${item:0:8} |tr ':' '-'`  oui.txt |cut -f3)
+		if [[ $vendor != '' ]]
+		then
+		    echo -n 'IEEE 设备制造商猜测: '
+	    	echo $vendor
+		fi
+    fi
+    if ((i==6))
+    then
+        i=0
+        ((j++))
+        echo ''
+    fi
+done
+
+echo '找到'$(($j-1))'条设备绑定信息。'

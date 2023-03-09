@@ -1,0 +1,57 @@
+#!/bin/bash
+fhelp() {
+    echo "kdsy-usrinfo [OPTIONS] USER_NAME"
+    echo "依据姓名查询某个用户的帐号数据"
+    echo "OPTIONS:"
+    echo "-s SIZE:	请求获取的数据条目数，默认为 10"
+    echo "-5:		输出服务器返回的用户密码 MD5，无论本地字典能否查到对应密码"
+    echo "-h:		显示帮助"
+    exit
+}
+url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_auth_mgmt.sh?s='`date +%s%3N`'&page_number=1&page_size='
+while getopts 's:h5' opt; do
+	case $opt in
+		s) sz=$OPTARG ;;
+		5) md5=true ;;
+		h) fhelp ;;
+		?) fhelp ;;
+	esac
+done
+shift $((OPTIND - 1))
+if [[ $1 == '' ]] ;then
+	fhelp
+fi
+if [[ $sz == '' ]] ;then
+	sz=10
+fi
+url=$url$sz'&name='$(echo -n $1|xxd -p -u |sed 's/[0-9A-Z]\{2\}/%&/g')
+echo '请求链接: '$url
+IFS=$'\n'
+result=`curl --silent $url |sed '1,/<row>/d' |grep '_name\|pwd\|duty\|count' |sed 's/[[:space:]]*<[^>]*>//g'`
+unset IFS
+i=0
+for item in $result
+do
+    data[i]=$item
+    ((i++))
+done
+for j in `seq $((i/6))`
+do
+	((k=(j-1)*6))
+	echo ''
+	echo '姓名: '${data[$((k+2))]}
+	echo '账号: '${data[$k]}
+	echo '职务: '${data[$((k+3))]}
+	pwd_out=`grep ${data[$((k+1))]} passwords.txt |sed 's/.*-[ ]//g'`
+	if [[ $pwd_out != '' ]] ;then
+		echo '密码: '$pwd_out
+	else
+		echo '本地字典未找到密码，请访问在线数据库进行反查'
+	fi
+	if [[ $pwd_out == '' || md5 == true ]] ;then
+		echo 'MD5: '${data[$((k+1))]}
+	fi
+	echo '设备数: '${data[$((k+4))]}/${data[$((k+5))]}
+	echo $'\n''以下是该用户绑定的设备信息'
+	./kdsy-bindinfo -t account ${data[$k]}
+done

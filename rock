@@ -1,0 +1,22 @@
+#!/bin/bash
+for i1 in {0..9}
+do
+	for i2 in {0..9}
+	do
+		for i3 in {0..9}
+		do
+			for i4 in {0..9}
+			do
+				for i5 in {0..9}
+				do
+					for i6 in {0..9}
+					do
+						set -- $(echo -n $i1$i2$i3$i4$i5$i6|md5sum)
+						echo -n -e '\r'$i1$i2$i3$i4$i5$i6 $1
+						echo $1 >> pwd1.txt
+					done
+				done
+			done
+		done
+	done
+done

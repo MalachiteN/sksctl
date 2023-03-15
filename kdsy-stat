@@ -1,0 +1,117 @@
+#!/bin/bash
+echo -e '登录设备统计\n'`date`
+url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0&page_size=300&user=sks'
+echo 'url: '$url
+result=`curl -sL $url |sed '1,/<row>/d' |grep access |sed -e's/[[:space:]]*<[^<]*>//g' -e's/[ ]/T/g'`
+i=0
+for item in $result
+do
+	timestamps[i]=`date +%s -d$item`
+	((i++))
+
+	#echo -n -e $item' '${timestamps[$((i-1))]}'\r'
+
+done
+((i--))
+firts=${timestamps[0]} # FIRst TimeStamp
+lats=${timestamps[$i]} # LAst TimeStamp
+line1=`head -n 1 <<< $result`
+linen=`tail -n 1 <<< $result`
+fir0ts=$(date +%s -d`sed 's/T.*//' <<< $line1`) # FIRst 0:00 TimeStamp
+la0ts=$(date +%s -d`sed 's/T.*//' <<< $linen`) # LAst 0:00 TimeStamp
+
+#debug begin
+echo ''
+echo '登录设备总数:' $((i+1))
+echo '最晚登录时间:' `date -Is -d@$firts |sed 's/\+.*//' |tr 'T' ' '`
+echo '最早登录时间:' `date -Is -d@$lats|sed 's/\+.*//' |tr 'T' ' '`
+echo '第一天零点:' `date -Is -d@$fir0ts|sed 's/\+.*//' |tr 'T' ' '`
+echo '最后一天零点:' `date -Is -d@$la0ts|sed 's/\+.*//' |tr 'T' ' '`
+#debug end
+
+lowb=$la0ts
+while ((lowb < lats)); do
+	lowb=$((lowb + 1800))
+done
+((lowb=lowb-1800))
+
+echo '时间下界:' `date -Is -d @$lowb |sed 's/\+.*//' |tr 'T' ' '` #debug
+
+#tmpts=$((fir0ts+86400))
+#while ((tmpts > firts)) ;do
+#	((tmpts=tmpts-1800))
+#done
+#((tmpts=tmpts+1800))
+
+#echo upper boundary':' `date -Is -d @$tmpts |sed 's/\+.*//' |tr 'T' ' '` #debug
+
+#uppb=$tmpts # UPPer Boundary
+
+k=0
+cnt=0
+l=0
+echo -e '\e[1;34m'`date -Id -d@$((lowb+k*1800))`'\e[0m'
+for j in `seq $i -1 0`
+do
+	if [[ $1 == 'true' ]] ;then
+	echo -e 'GET '$j': '${timestamps[$j]}' ('`date -Is -d@${timestamps[$j]}`'), k='$k #'\r'
+	fi
+	while (( lowb+(k+1)*1800 < timestamps[j] )) ;do
+		if [[ $1 == 'true' ]] ;then
+			echo -e 'trying '`date -Im -d@$((lowb+k*1800))`' to '`date -Im -d@$((lowb+(k+1)*1800))`', k='$k #'\r'
+		fi
+		lb=`date -Im -d @$((lowb+k*1800)) |sed -e's/\+.*//' -e's/.*T//'`
+	    ub=`date -Im -d @$((lowb+(k+1)*1800)) |sed -e's/\+.*//' -e's/.*T//'`
+		if (( (lowb+k*1800) >= fir0ts)) && (( (lowb+(k+1)*1800) <= (fir0ts+7*3600) )) ;then
+			((k++))
+			if [[ $1 == true ]] ;then
+				echo 'skipping impossible time period'
+			fi
+			if [[ $l == 0 ]] ;then
+				l=1
+				echo -e '\e[1;34m'`date -Id -d@$((lowb+k*1800))`'\e[0m'
+			fi
+			continue
+		fi
+		echo -n $lb - $ub': '
+	    if ((cnt < 10)) ;then
+    	    echo -e -n '\e[32m'
+    	elif ((cnt >= 10)) && ((cnt < 20)) ;then
+        	echo -e -n '\e[33m'
+    	else
+        	echo -e -n '\e[31m'
+    	fi
+    	for n in `seq 1 $cnt`
+    	do
+        	echo -n '▇▇'
+    	done
+    	echo -e '\e[0m '$cnt
+		((k++))
+    	cnt=0
+	done
+	if [[ $1 == 'true' ]] ;then
+		echo -e 'SUCC '$j': '${timestamps[$j]}' ('`date -Is -d@${timestamps[$j]}`'), k='$k #'\r'
+	fi
+	#if ((k < -1)) ;then
+	#	echo 'Assertion fault!'
+	#	exit
+	#fi
+	((cnt++))
+	#((counts[k]++))
+done
+#spj
+		lb=`date -Im -d @$((lowb+k*1800)) |sed -e's/\+.*//' -e's/.*T//'`
+        ub=`date -Im -d @$((lowb+(k+1)*1800)) |sed -e's/\+.*//' -e's/.*T//'`
+		echo -n $lb - $ub': '
+        if ((cnt < 10)) ;then
+            echo -e -n '\e[32m'
+        elif ((cnt >= 10)) && ((cnt < 20)) ;then
+            echo -e -n '\e[33m'
+        else
+            echo -e -n '\e[31m'
+        fi
+        for n in `seq 1 $cnt`
+        do
+            echo -n '▇▇'
+        done
+        echo -e '\e[0m '$cnt

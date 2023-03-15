@@ -1,0 +1,2 @@
+#!/bin/bash
+echo -n $((`grep $1 passwords.txt -n |sed 's/:.*//'`-1))

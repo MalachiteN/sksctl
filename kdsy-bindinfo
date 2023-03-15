@@ -3,9 +3,9 @@ fhelp() {
 	echo "kdsy-bindinfo [OPTIONS] ACCOUNT|MAC|USER_NAME"
     echo "查询某个账号/设备MAC/用户姓名的设备绑定信息"
     echo "OPTIONS:"
-    echo "-t account|mac|name:	查询类别"
-    echo "-s SIZE:		请求获取的数据条目数，默认为 3（一般每个用户的设备数上限即为 3 ）"
-    echo "-h:			显示帮助"
+    echo "	-t account|mac|name:	查询类别，默认为用户姓名"
+    echo "	-s SIZE:		请求获取的数据条目数，默认为 3（一般每个用户的设备数上限即为 3 ）"
+    echo "	-h:			显示帮助"
     exit
 }
 url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0'
@@ -36,8 +36,9 @@ fi
 url=$url${types[$typ]}$payload'&page_size='$sz
 echo '请求链接: '$url
 result=$(curl --silent $url |sed '1,/<row>/d' |grep 'type\|ip\|mac\|time\|et_i' |tr ' ' ',' |sed 's/[[:space:]]*<[^>]*>//g')
-titles=('登录状态' '设备MAC' 'IP' '用户所在模板' '认证时间' '会话过期时间')
+titles=('登录状态' '设备MAC' '设备IP地址' '所在模板' '认证时间' '过期时间')
 declare -A methods=(['A']='已认证' ['B']='黑名单' ['W']='白名单' ['E']='会话过期' ['C']='域间漫游' ['Q']='域间漫游(可授权)')
+echo ''
 i=0
 j=1
 for item in $result
@@ -46,7 +47,7 @@ do
     then
         echo '第'$j'个设备'
     fi
-    echo -n ${titles[i]}': '
+    echo -n ${titles[i]}':	'
     if [[ $item == '' ]]
     then
         echo '暂无'
@@ -62,7 +63,7 @@ do
         vendor=$(grep `echo ${item:0:8} |tr ':' '-'`  oui.txt |cut -f3)
 		if [[ $vendor != '' ]]
 		then
-		    echo -n 'IEEE 设备制造商猜测: '
+		    echo -n '制造商猜测:	'
 	    	echo $vendor
 		fi
     fi

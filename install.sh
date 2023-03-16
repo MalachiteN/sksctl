@@ -16,6 +16,7 @@ while getopts 'iuh' opt ;do
 			termux-setup-storage
 			termux-change-repo
 			pkg upgrade
+			pkg ins sqlite
 			upd=true
 		;;
 		u) upd=true ;;
@@ -29,14 +30,14 @@ fi
 linenum=`grep -c KDSY ~/.profile`
 if [[ $linenum == 0 ]] ;then
 	echo 'export KDSY=~/.local/share/kdsy' >> ~/.profile
-	echo -e '\e[33m设定了环境变量。安装结束后请手动执行 export ~/.profile\e[0m'
+	echo 'export PATH=$PATH:$KDSY' >> ~/.profile
+	echo -e '\e[33m设定了环境变量。安装结束后请手动执行 source ~/.profile\e[0m'
 	source ~/.profile
 fi
 if [ -d $KDSY ] ;then
 	echo '正在更新数据'
 	rm -r $KDSY
 fi
-mkdir $KDSY
-cp ./kdsy-* $PREFIX/bin/
-cp ./*.txt $KDSY
+mkdir -p $KDSY
+cp ./* $KDSY
 ls -s $KDSY

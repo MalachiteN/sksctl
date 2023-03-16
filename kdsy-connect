@@ -1,0 +1,8 @@
+#!/bin/bash
+random_mac=`xxd -p -l6 -u < /dev/random |sed -e's/[0-9A-Z]\{2\}/&:/g' -e's/.$//'`
+redirected=`curl -Ls -o /dev/null -w %{url_effective} http://1.1.1.1`
+if [[ $redirected =~ login ]] ;then
+	echo '已登录'
+	exit
+fi
+echo 'todo'

@@ -1,0 +1,197 @@
+#!/bin/bash
+
+help() {
+	echo 'kdsy-gather [OPTIONS]'
+	echo '从网关下载最近一天绕过验证登录的数据保存至本地 SQLite 数据库，供将来进行一些分析'
+	echo 'OPTIONS:'
+	echo '	-f FILE:	指定数据库文件，默认为 '$KDSY'/kdsy.db'
+	echo '	-h:		显示帮助信息'
+	echo '	-d:		删除数据库，但保留最近一次的备份。如果没有数据库，会报错退出。'
+	echo '	-r:		恢复最近一次备份。如果没有备份或者被手动删除，会报错退出。'
+	echo '	-b:		输出两个完整的数据表。请结合 less 或 more 使用。'
+	echo '	-s: SIZE	指定获取数据条目数，默认为200'
+	exit
+}
+
+while getopts 'f:s:dbrh' opt ;do
+	case $opt in
+		f) f=$OPTARG ;;
+		d) d=true ;;
+		b) b=true ;;
+		r) r=true ;;
+		s) s=$OPTARG ;;
+		h) help ;;
+		?) help ;;
+	esac
+done
+shift $((OPTIND-1))
+
+if [[ -z $s ]] ;then
+	s=200
+fi
+
+if [[ ! -d $KDSY ]] ;then
+	echo '尚未执行安装脚本，请退出执行安装脚本（./install.sh）'
+	exit
+fi
+
+if [[ -z $f ]] ;then
+    f=$KDSY'/kdsy.db'
+    echo -e '\e[33m使用默认数据库 '$KDSY'/kdsy.db\e[0m'
+fi
+
+if [[ ! -z $d ]] ;then
+	read -p '重置数据库？(Y/n): ' tmp
+	case $tmp in
+		[Yy][Ee][Ss]|[Yy])
+			echo -e '\e[31m删除\e[0m'
+			if [[ -f $f ]] ;then
+				mv $f $f'.bak'
+			else
+				echo -e '\e[31m操作失败：数据库不存在\e[0m'
+				exit
+			fi
+		;;
+		[Nn][Oo]|[Nn])
+			echo '取消'
+			exit
+		;;
+	esac
+fi
+
+if [[ ! -z $r ]] ;then
+	read -p '恢复最近一次删除的数据库？当前若存在数据库，将被覆盖 (Y/n): ' tmp
+	case $tmp in
+		[Yy][Ee][Ss]|[Yy])
+			echo -e '\e[31m恢复\e[0m'
+			if [[ -f $f'.bak' ]] ;then
+				mv $f'.bak' $f
+			else
+				echo -e '\e[31m操作失败：备份不存在\e[0m'
+				exit
+			fi
+		;;
+		[Nn][Oo]|[Nn])
+			echo '取消'
+			exit
+		;;
+    esac
+fi
+
+if [[ ! -f $f ]] ;then
+	echo -e '\e[33m数据库文件不存在，正在创建文件\e[0m'
+	touch $f
+	echo -e '\e[33m正在创建数据表\e[0m'
+	sqlite3 $f <<-end
+	CREATE TABLE USR(
+		MAC			TEXT	PRIMARY KEY		NOT NULL,
+		IP			TEXT							,
+		EXPIRE		INT						NOT NULL,
+		EXPIRE_STR	TEXT
+	);
+	CREATE TABLE LOGIN(
+		ACCESS		INT		NOT NULL,
+		ACCESS_STR	TEXT			,
+		MAC			TEXT	NOT NULL,
+		PRIMARY KEY (ACCESS, MAC)
+	);
+	.tables
+	.quit
+	end
+fi
+
+summ() {
+	echo -n -e '\e[32m'
+	if [[ $1 == 'updated' ]] ;then
+		echo '更新完成'
+	elif [[ $1 == 'update' ]] ;then
+		echo '开始更新本地记录'
+	else
+		echo -n '' #pass
+	fi
+	echo -n -e '\e[0m'
+	nusr=`sqlite3 $f 'SELECT COUNT(1) FROM USR'`
+	nlogin=`sqlite3 $f 'SELECT COUNT(1) FROM LOGIN'`
+	echo '当前数据库中存在 '$nusr' 个MAC，'$nlogin' 条登录记录'
+	if [[ ! -z $2 ]] && [[ ! -z $3 ]] ;then
+		echo -e '\e[32m新增了 '$((nusr-$2))' 个MAC，'$((nlogin-$3))' 条登录记录\e[0m'
+	fi
+}
+
+box() {
+	echo 'TABLE NAME: '$1
+	sqlite3 $f -box 'SELECT * FROM '$1' ORDER BY '$2' DESC;'
+}
+
+if [[ ! -z $b ]] ;then
+	summ
+	box 'USR' 'EXPIRE'
+	box 'LOGIN' 'ACCESS'
+	exit
+fi
+
+url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0&user=sks&page_size='$s
+echo 'URL: '$url
+result=`curl -sL $url|sed '1,/<row>/d'|grep 'mac\|ip\|access\|expire'|sed 's/[[:space:]]*<[^<]*>//g'`
+
+if [[ -z $result ]] ;then
+	echo -e '\e[31m网络错误\e[0m'
+	exit
+fi
+
+summ 'update'
+n1=$nusr
+n2=$nlogin
+
+IFS=$'\n'
+i=0
+for item in $result ;do
+	t=$((i/4))
+	case $(( i % 4 )) in
+		0) amac[$t]=$item ;;
+		1) aip[$t]=$item ;;
+		2) aacc[$t]=$item ;;
+		3) aexp[$t]=$item ;;
+	esac
+	((i++))
+done
+((i--))
+
+for j in `seq 0 $((i/4))` ;do
+	mac="'"${amac[$j]}"'"
+	ip="'"${aip[$j]}"'"
+	accs="'"${aacc[$j]}"'"
+	exps="'"${aexp[$j]}"'"
+	acc=`date +%s -d${aacc[j]}`
+	exp=`date +%s -d${aexp[j]}`
+	sqlite3 $f <<-end
+		UPDATE USR
+		SET
+			IP			=	$ip,
+			EXPIRE		=	$exp,
+			EXPIRE_STR	=	$exps
+		WHERE
+			MAC		=	$mac
+			AND EXISTS(
+				SELECT 1 FROM USR
+				WHERE MAC = $mac
+				)
+		;
+
+		INSERT INTO USR (MAC,	IP,		EXPIRE,	EXPIRE_STR)
+		SELECT 			 $mac,	$ip,	$exp,	$exps
+		WHERE NOT EXISTS(
+			SELECT 1 FROM USR
+			WHERE MAC = $mac
+		);
+
+		INSERT INTO LOGIN	(ACCESS,	ACCESS_STR,	MAC)
+		SELECT				 $acc,		$accs,		$mac
+		WHERE NOT EXISTS(
+			SELECT 1 FROM LOGIN
+			WHERE	ACCESS	=	$acc
+			AND		MAC		=	$mac
+		);
+	end
+done
+summ 'updated' $n1 $n2

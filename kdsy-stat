@@ -54,6 +54,10 @@ cnt=0
 pbar() {
 	lstr=`date -Im -d@$((cur-p)) |sed -e's/\+.*//' -e's/.*T//'`
 	rstr=`date -Im -d@$cur |sed -e's/\+.*//' -e's/.*T//'`
+	hr=`echo $lstr |sed -e's/:.*//' -e's/^0//'`
+	if ((hr<7)) ;then
+		return
+	fi
 	echo -e -n '\e[34m'$lstr' - '$rstr': \e[0m'
 	if (($cnt < 10)) ;then
 		color='\e[32m'							# 1-9	Green

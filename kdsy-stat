@@ -1,117 +1,87 @@
 #!/bin/bash
-echo -e '登录设备统计\n'`date`
-url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0&page_size=300&user=sks'
-echo 'url: '$url
-result=`curl -sL $url |sed '1,/<row>/d' |grep access |sed -e's/[[:space:]]*<[^<]*>//g' -e's/[ ]/T/g'`
-i=0
-for item in $result
-do
-	timestamps[i]=`date +%s -d$item`
-	((i++))
+help() {
+	echo 'kdsy-stat [OPTIONS]'
+}
 
-	#echo -n -e $item' '${timestamps[$((i-1))]}'\r'
-
+while getopts 'f:l:r:p:m:vh' opt ;do
+	case $opt in
+		f) db=$OPTARG ;;
+		l) l=$OPTARG ;;
+		r) r=$OPTARG ;;
+		p) p=$OPTARG ;;
+		m) m=$OPTARG ;;
+		v) v=true ;;
+		h) help ;;
+		?) help ;;
+	esac
 done
-((i--))
-firts=${timestamps[0]} # FIRst TimeStamp
-lats=${timestamps[$i]} # LAst TimeStamp
-line1=`head -n 1 <<< $result`
-linen=`tail -n 1 <<< $result`
-fir0ts=$(date +%s -d`sed 's/T.*//' <<< $line1`) # FIRst 0:00 TimeStamp
-la0ts=$(date +%s -d`sed 's/T.*//' <<< $linen`) # LAst 0:00 TimeStamp
+shift $((OPTIND-1))
 
-#debug begin
-echo ''
-echo '登录设备总数:' $((i+1))
-echo '最晚登录时间:' `date -Is -d@$firts |sed 's/\+.*//' |tr 'T' ' '`
-echo '最早登录时间:' `date -Is -d@$lats|sed 's/\+.*//' |tr 'T' ' '`
-echo '第一天零点:' `date -Is -d@$fir0ts|sed 's/\+.*//' |tr 'T' ' '`
-echo '最后一天零点:' `date -Is -d@$la0ts|sed 's/\+.*//' |tr 'T' ' '`
-#debug end
+if [[ -z $db ]] ;then
+	db=$KDSY/kdsy.db
+fi
+if [[ ! -f $db ]] ;then
+	echo -e '\e[31m数据库不存在，请先运行 kdsy-gather 初始化数据库并收集信息\e[0m'
+	exit
+fi
 
-lowb=$la0ts
-while ((lowb < lats)); do
-	lowb=$((lowb + 1800))
-done
-((lowb=lowb-1800))
+# Right limit
+if [[ -z $r ]] ;then
+	r=$((`date +%s`+1800))	# UNIX timestamp now
+	(( r = r - ( r % 1800 ) ))
+fi
+# Left limit
+if [[ -z $l ]] ;then
+	l=$((r-86400))			# 24 hours before now
+fi
+# Period
+if [[ -z $p ]] ;then
+	p=1800					# Half an hour
+fi
+# Multiply length
+if [[ -z $m ]] ;then
+	m=2
+fi
 
-echo '时间下界:' `date -Is -d @$lowb |sed 's/\+.*//' |tr 'T' ' '` #debug
+# debug
+if [[ ! -z $v ]] ;then
+	echo '当前时间: '`date -Is -d@$l`'  '`date -Is -d@$r`
+	echo '区间长度: '$p' 秒, 直方图长度倍率: '$m
+fi
 
-#tmpts=$((fir0ts+86400))
-#while ((tmpts > firts)) ;do
-#	((tmpts=tmpts-1800))
-#done
-#((tmpts=tmpts+1800))
-
-#echo upper boundary':' `date -Is -d @$tmpts |sed 's/\+.*//' |tr 'T' ' '` #debug
-
-#uppb=$tmpts # UPPer Boundary
-
-k=0
+cur=$l
 cnt=0
-l=0
-echo -e '\e[1;34m'`date -Id -d@$((lowb+k*1800))`'\e[0m'
-for j in `seq $i -1 0`
-do
-	if [[ $1 == 'true' ]] ;then
-	echo -e 'GET '$j': '${timestamps[$j]}' ('`date -Is -d@${timestamps[$j]}`'), k='$k #'\r'
+pbar() {
+	lstr=`date -Im -d@$((cur-p)) |sed -e's/\+.*//' -e's/.*T//'`
+	rstr=`date -Im -d@$cur |sed -e's/\+.*//' -e's/.*T//'`
+	echo -e -n '\e[34m'$lstr' - '$rstr': \e[0m'
+	if (($cnt < 10)) ;then
+		color='\e[32m'							# 1-9	Green
+	elif (($cnt >= 10)) && (($cnt < 20)) ;then
+		color='\e[33m'							# 10-19	Yellow
+	else
+		color='\e[31m'							# 20+	Red
 	fi
-	while (( lowb+(k+1)*1800 < timestamps[j] )) ;do
-		if [[ $1 == 'true' ]] ;then
-			echo -e 'trying '`date -Im -d@$((lowb+k*1800))`' to '`date -Im -d@$((lowb+(k+1)*1800))`', k='$k #'\r'
-		fi
-		lb=`date -Im -d @$((lowb+k*1800)) |sed -e's/\+.*//' -e's/.*T//'`
-	    ub=`date -Im -d @$((lowb+(k+1)*1800)) |sed -e's/\+.*//' -e's/.*T//'`
-		if (( (lowb+k*1800) >= fir0ts)) && (( (lowb+(k+1)*1800) <= (fir0ts+7*3600) )) ;then
-			((k++))
-			if [[ $1 == true ]] ;then
-				echo 'skipping impossible time period'
-			fi
-			if [[ $l == 0 ]] ;then
-				l=1
-				echo -e '\e[1;34m'`date -Id -d@$((lowb+k*1800))`'\e[0m'
-			fi
-			continue
-		fi
-		echo -n $lb - $ub': '
-	    if ((cnt < 10)) ;then
-    	    echo -e -n '\e[32m'
-    	elif ((cnt >= 10)) && ((cnt < 20)) ;then
-        	echo -e -n '\e[33m'
-    	else
-        	echo -e -n '\e[31m'
-    	fi
-    	for n in `seq 1 $cnt`
-    	do
-        	echo -n '▇▇'
-    	done
-    	echo -e '\e[0m '$cnt
-		((k++))
-    	cnt=0
+	echo -n -e $color
+
+	for j in `seq 1 $((cnt*m))` ;do
+		echo -n '▇'
 	done
-	if [[ $1 == 'true' ]] ;then
-		echo -e 'SUCC '$j': '${timestamps[$j]}' ('`date -Is -d@${timestamps[$j]}`'), k='$k #'\r'
+
+	echo -e '\e[0m '$cnt						# End
+}
+
+cur=$l
+for i in `seq 1 $(( (r - l) / p ))` ;do
+	cur=$((cur+p))
+	cnt=`sqlite3 $db 'SELECT COUNT(1) FROM LOGIN WHERE ACCESS > '$((cur-p))' AND ACCESS < '$cur`
+	if [[ ! -z $v ]] ;then
+		sqlite3 $db -box 'SELECT * FROM LOGIN WHERE ACCESS > '$((cur-p))' AND ACCESS < '$cur' ORDER BY ACCESS'
 	fi
-	#if ((k < -1)) ;then
-	#	echo 'Assertion fault!'
-	#	exit
-	#fi
-	((cnt++))
-	#((counts[k]++))
+	pbar
 done
-#spj
-		lb=`date -Im -d @$((lowb+k*1800)) |sed -e's/\+.*//' -e's/.*T//'`
-        ub=`date -Im -d @$((lowb+(k+1)*1800)) |sed -e's/\+.*//' -e's/.*T//'`
-		echo -n $lb - $ub': '
-        if ((cnt < 10)) ;then
-            echo -e -n '\e[32m'
-        elif ((cnt >= 10)) && ((cnt < 20)) ;then
-            echo -e -n '\e[33m'
-        else
-            echo -e -n '\e[31m'
-        fi
-        for n in `seq 1 $cnt`
-        do
-            echo -n '▇▇'
-        done
-        echo -e '\e[0m '$cnt
+if [[ ! -z $v ]] ;then
+	echo -n '区间内总登录数: '
+	sqlite3 $db 'SELECT COUNT(1) FROM LOGIN WHERE ACCESS > '$l' AND ACCESS < '$r
+	echo '数据库每半小时自动更新一次，最近半小时信息缺失属于正常情况，可手动更新'
+fi

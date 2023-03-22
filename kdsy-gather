@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/data/data/com.termux/files/usr/bin/bash
 
 help() {
 	echo 'kdsy-gather [OPTIONS]'
@@ -157,6 +157,12 @@ for item in $result ;do
 done
 ((i--))
 
+if [[ $1 != 'debug' ]] ;then
+	g=1
+else
+	echo '下载了 '$((i/4+1))' 条记录'
+fi
+
 for j in `seq 0 $((i/4))` ;do
 	mac="'"${amac[$j]}"'"
 	ip="'"${aip[$j]}"'"
@@ -164,6 +170,15 @@ for j in `seq 0 $((i/4))` ;do
 	exps="'"${aexp[$j]}"'"
 	acc=`date +%s -d${aacc[j]}`
 	exp=`date +%s -d${aexp[j]}`
+	if [[ -z $g ]] ;then
+		echo -e '\e[32m=== 第 '$((j+1))' 条记录 ===\e[0m'
+		echo 'MAC: '$mac
+		echo 'ACC: '$accs' ('$acc')'
+		echo 'EXP: '$exps' ('$exp')'
+		sqlite3 $f -box 'SELECT * FROM USR WHERE MAC = '$mac
+		sqlite3 $f -box 'SELECT * FROM LOGIN WHERE ACCESS = '$acc
+		usr0=`sqlite3 $f 'SELECT COUNT(*) FROM USR'`
+	fi
 	sqlite3 $f <<-end
 		UPDATE USR
 		SET
@@ -177,7 +192,18 @@ for j in `seq 0 $((i/4))` ;do
 				WHERE MAC = $mac
 				)
 		;
-
+	end
+	if [[ -z $g ]] ;then
+		usr1=`sqlite3 $f 'SELECT COUNT(*) FROM USR'`
+		echo 'origin: '$usr0' now: '$usr1
+		if [[ $usr0 == $usr1 ]] ;then
+			echo '用户存在'
+		else
+			echo '新用户'
+		fi
+		log0=`sqlite3 $f 'SELECT COUNT(*) FROM LOGIN'`
+	fi
+	sqlite3 $f <<-end
 		INSERT INTO USR (MAC,	IP,		EXPIRE,	EXPIRE_STR)
 		SELECT 			 $mac,	$ip,	$exp,	$exps
 		WHERE NOT EXISTS(
@@ -193,5 +219,14 @@ for j in `seq 0 $((i/4))` ;do
 			AND		MAC		=	$mac
 		);
 	end
+	if [[ -z $g ]] ;then
+		log1=`sqlite3 $f 'SELECT COUNT(*) FROM LOGIN'`
+		echo 'origin: '$log0' now: '$log1
+		if [[ $log0 == $log1 ]] ;then
+			echo '登录记录存在'
+		else
+			echo '新记录'
+    	fi
+    fi
 done
 summ 'updated' $n1 $n2

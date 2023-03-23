@@ -1,8 +1,8 @@
 SHELL=/data/data/com.termux/files/usr/bin/bash
 PREFIX=/data/data/com.termux/files/usr
-PATH=/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/share/kdsy/
+PATH=/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/home/.local/share/kdsy
 MAILTO=root
 HOME=/data/data/com.termux/files/home
 KDSY=/data/data/com.termux/files/home/.local/share/kdsy
 
-*/30 * * * * $HOME/kdsy/cron.sh > /dev/null
+*/30 * * * * $KDSY/cron.sh >> $KDSY/gather.log

@@ -56,9 +56,13 @@ pbar() {
 	rstr=`date -Im -d@$cur |sed -e's/\+.*//' -e's/.*T//'`
 	hr=`echo $lstr |sed -e's/:.*//' -e's/^0//'`
 	if ((hr<7)) ;then
+		if [[ -z $flag ]] ;then
+			echo -e '\e[34m'`date -Id -d@$cur`'\e[0m'
+			flag=1
+		fi
 		return
 	fi
-	echo -e -n '\e[34m'$lstr' - '$rstr': \e[0m'
+	echo -e -n $lstr' - '$rstr' '
 	if (($cnt < 10)) ;then
 		color='\e[32m'							# 1-9	Green
 	elif (($cnt >= 10)) && (($cnt < 20)) ;then
@@ -75,7 +79,7 @@ pbar() {
 	echo -e '\e[0m '$cnt						# End
 }
 
-cur=$l
+echo -e '\e[34m'`date -Id -d@$cur`'\e[0m'
 for i in `seq 1 $(( (r - l) / p ))` ;do
 	cur=$((cur+p))
 	cnt=`sqlite3 $db 'SELECT COUNT(1) FROM LOGIN WHERE ACCESS > '$((cur-p))' AND ACCESS < '$cur`
@@ -89,3 +93,4 @@ if [[ ! -z $v ]] ;then
 	sqlite3 $db 'SELECT COUNT(1) FROM LOGIN WHERE ACCESS > '$l' AND ACCESS < '$r
 	echo '数据库每半小时自动更新一次，最近半小时信息缺失属于正常情况，可手动更新'
 fi
+

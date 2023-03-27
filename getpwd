@@ -1,2 +1,6 @@
 #!/bin/bash
-echo -n $((`grep $1 passwords.txt -n |sed 's/:.*//'`-1))
+res=$((`grep $1 passwords.txt -n |sed 's/:.*//'`-1))
+while [[ ${#res} != 6 ]] ;do
+	res=0$res
+done
+echo -n $res

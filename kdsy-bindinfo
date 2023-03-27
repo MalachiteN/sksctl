@@ -34,7 +34,7 @@ if [[ $sz == '' ]] ;then
 	sz=3
 fi
 url=$url${types[$typ]}$payload'&page_size='$sz
-echo '请求链接: '$url
+echo -e '请求链接: \e[33m'$url'\e[0m'
 result=$(curl --silent $url |sed '1,/<row>/d' |grep 'type\|ip\|mac\|time\|et_i' |tr ' ' ',' |sed 's/[[:space:]]*<[^>]*>//g')
 titles=('登录状态' '设备MAC' '设备IP地址' '所在模板' '认证时间' '过期时间')
 declare -A methods=(['A']='已认证' ['B']='黑名单' ['W']='白名单' ['E']='会话过期' ['C']='域间漫游' ['Q']='域间漫游(可授权)')
@@ -45,12 +45,12 @@ for item in $result
 do
     if ((i==0))
     then
-        echo '第'$j'个设备'
+        echo -e '\e[34m第'$j'个设备\e[0m'
     fi
     echo -n ${titles[i]}':	'
     if [[ $item == '' ]]
     then
-        echo '暂无'
+        echo -e '\e[31m暂无\e[0m'
     elif ((i==0))
     then
         echo ${methods[$item]}
@@ -63,8 +63,8 @@ do
         vendor=$(grep `echo ${item:0:8} |tr ':' '-'`  oui.txt |cut -f3)
 		if [[ $vendor != '' ]]
 		then
-		    echo -n '制造商猜测:	'
-	    	echo $vendor
+		    echo -n -e '\e[32m制造商猜测:	'
+	    	echo -e $vendor'\e[0m'
 		fi
     fi
     if ((i==6))
@@ -75,4 +75,4 @@ do
     fi
 done
 
-echo '找到'$(($j-1))'条设备绑定信息。'
+echo -e '\e[32m找到'$(($j-1))'条设备绑定信息。\e[0m'

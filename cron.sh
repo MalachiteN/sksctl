@@ -14,6 +14,6 @@ fi
 
 echo -e '\e[33m=== === ===		BEGIN		=== === ===\e[0m'
 echo `date`
-kdsy-gather -s 60
+kdsy-gather -s 40
 echo `date`
 echo -e '\e[33m=== === ===		END		=== === ===\e[0m\n'

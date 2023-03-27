@@ -25,7 +25,7 @@ if [[ $sz == '' ]] ;then
 	sz=10
 fi
 url=$url$sz'&name='$(echo -n $1|xxd -p -u |sed 's/[0-9A-Z]\{2\}/%&/g')
-echo '请求链接: '$url
+echo -e '请求链接: ''\e[33m'$url'\e[0m'
 IFS=$'\n'
 result=`curl --silent $url |sed '1,/<row>/d' |grep '_name\|pwd\|duty\|count' |sed 's/[[:space:]]*<[^>]*>//g'`
 unset IFS
@@ -39,19 +39,28 @@ for j in `seq $((i/6))`
 do
 	((k=(j-1)*6))
 	echo ''
-	echo '姓名:	'${data[$((k+2))]}
-	echo '账号:	'${data[$k]}
+	echo -e '\e[34m姓名:\e[0m	'${data[$((k+2))]}
+	echo -e '\e[32m账号:\e[0m	'${data[$k]}
 	echo '职务:	'${data[$((k+3))]}
 	pwd_out=`getpwd ${data[$((k+1))]}`
-	if [[ $pwd_out != -1 ]] ;then
-		echo '密码:	'$pwd_out
+	if [[ $pwd_out != '0000-1' ]] ;then
+		echo -e '\e[32m密码:\e[0m	'$pwd_out
 	else
-		echo '本地字典未找到密码，请访问在线数据库进行反查'
+		echo -e '\e[31m本地字典未找到密码，请访问在线数据库进行反查\e[0m'
 	fi
-	if [[ $pwd_out == -1 || $md5 == true ]] ;then
-		echo 'MD5:	'${data[$((k+1))]}
+	if [[ $pwd_out == '0000-1' || $md5 == true ]] ;then
+		echo -e '\e[33mMD5:\e[0m	'${data[$((k+1))]}
 	fi
-	echo '设备数:	'${data[$((k+4))]}/${data[$((k+5))]}
-	echo $'\n''以下是该用户绑定的设备信息'
+	dn=${data[$((k+4))]}
+	echo -n '设备数:	'
+	case $dn in
+		0) echo -e -n '\e[32m' ;;
+		1) echo -e -n '\e[34m' ;;
+		2) echo -e -n '\e[33m' ;;
+		?) echo -e -n '\e[31m' ;;
+	esac
+	echo -e ${data[$((k+4))]}/${data[$((k+5))]}'\e[0m'
+	echo ''
+	echo -e '\e[33m以下是该用户绑定的设备信息\e[0m'
 	./kdsy-bindinfo -t account ${data[$k]}
 done

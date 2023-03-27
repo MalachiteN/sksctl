@@ -1,6 +1,15 @@
 #!/bin/bash
 help() {
 	echo 'kdsy-stat [OPTIONS]'
+	echo '从本地数据库中读取登录数据并生成统计图'
+	echo -e '\e[1mOPTIONS:\e[0m'
+	echo '	-f:	指定本地数据库文件，不指定则使用默认数据库'
+	echo '	-l|r:	指定时间区间上下界限，只接受 UNIX 时间戳'
+	echo '	-p:	指定时间区间长度，单位为秒'
+	echo '	-m:	指定用于显示条形图的单位长度'
+	echo '	-v:	verbose (详细模式)，将输出额外信息和每个区间的登录用户统计表'
+	echo '本程序不会向云端发起请求，因此可能缺失最新数据，请运行 kdsy-gather 手动更新。'
+	exit
 }
 
 while getopts 'f:l:r:p:m:vh' opt ;do

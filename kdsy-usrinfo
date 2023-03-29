@@ -62,5 +62,5 @@ do
 	echo -e ${data[$((k+4))]}/${data[$((k+5))]}'\e[0m'
 	echo ''
 	echo -e '\e[33m以下是该用户绑定的设备信息\e[0m'
-	./kdsy-bindinfo -t account ${data[$k]}
+	kdsy-bindinfo -t account ${data[$k]}
 done

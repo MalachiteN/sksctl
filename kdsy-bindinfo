@@ -60,7 +60,7 @@ do
     ((i++))
     if ((i==2))
     then
-        vendor=$(grep `echo ${item:0:8} |tr ':' '-'`  oui.txt |cut -f3)
+        vendor=$(grep `echo ${item:0:8} |tr ':' '-'`  $KDSY/oui.txt |cut -f3)
 		if [[ $vendor != '' ]]
 		then
 		    echo -n -e '\e[32m制造商猜测:	'

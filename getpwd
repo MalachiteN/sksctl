@@ -1,5 +1,5 @@
 #!/bin/bash
-res=$((`grep $1 passwords.txt -n |sed 's/:.*//'`-1))
+res=$((`grep $1 $KDSY/passwords.txt -n |sed 's/:.*//'`-1))
 while [[ ${#res} != 6 ]] ;do
 	res=0$res
 done

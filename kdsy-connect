@@ -1,8 +1,42 @@
 #!/bin/bash
-random_mac=`xxd -p -l6 -u < /dev/random |sed -e's/[0-9A-Z]\{2\}/&:/g' -e's/.$//'`
-redirected=`curl -Ls -o /dev/null -w %{url_effective} http://1.1.1.1`
-if [[ $redirected =~ login ]] ;then
-	echo '已登录'
+
+fhelp() {
+	echo 'kdsy-connect [OPTIONS]'
+	echo '连接网络'
+	echo -e '\e[1mOPTIONS:\e[0m'
+	echo '	-m MAC:	提供用于登录的MAC'
+	echo '	-h:		显示帮助'
 	exit
+}
+
+while getopts 'm:h' opt ;do
+	case $opt in
+	m) mac=$OPTARG ;;
+	h) fhelp ;;
+	?) fhelp ;;
+	esac
+done
+
+if [[ -z $mac ]] ;then
+	if [[ ! -f $KDSY/ip.rc ]] ;then
+		echo '首次使用，正在生成随机MAC'
+		mac=`ifconfig|grep -A3 wlan0|sed -ne's/tx.*//' -e's/[ ]*ether[ ]//' -e's/.\{11\}$//' -e'4p'``xxd -p -l 3 < /dev/random|sed -e's/../:&/g'`
+		echo -n $mac > $KDSY/ip.rc
+	else
+		mac=`cat $KDSY/ip.rc`
+	fi
 fi
-echo 'todo'
+rip=`ifconfig|grep -A1 wlan0|sed -ne's/netmask.*//' -e's/[ ]*inet[ ]//' -e'2p'`
+redirected=`curl -Ls -o /dev/null -w %{url_effective} http://1.1.1.1`
+echo 'MAC:	'$mac
+echo '设备IP:	'$rip
+echo '重定向:	'$redirected
+if [[ $redirected =~ login.html ]] ;then
+	echo '本设备已登录成功'
+	#exit #DEBUG
+fi
+# QRCODE = 1 WECHAT1 = 4 WECHAT2 = 5 ONE_KEY = 6
+md5pwd=e10adc3949ba59abbe56e057f20f883e
+sPageURL='ssid_index=1&portal_id=7&acip=1.1.1.1&userip='$rip'&usermac='$mac'&iwgmac=04:8b:42:10:c6:20'
+url="http://1.1.1.1:8081/app?web&username=sks&password="$md5pwd"&"$sPageURL"&portal_type=6"
+echo 'URL:	'$url

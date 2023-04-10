@@ -8,7 +8,7 @@ fhelp() {
     echo "	-h:		显示帮助"
     exit
 }
-url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_auth_mgmt.sh?s='`date +%s%3N`'&page_number=1&page_size='
+url='http://10.72.174.2/cgi-bin/sgw_cgi/cgi_list_auth_mgmt.sh?s='`date +%s%3N`'&page_number=1&page_size='
 while getopts 's:h5' opt; do
 	case $opt in
 		s) sz=$OPTARG ;;

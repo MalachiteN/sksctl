@@ -8,7 +8,7 @@ fhelp() {
     echo "	-h:			显示帮助"
     exit
 }
-url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0'
+url='http://10.72.174.2/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0'
 declare -A types=(['account']='&user=' ['mac']='&mac=' ['name']='&ext_name=')
 while getopts 't:s:h' opt; do
     case $opt in

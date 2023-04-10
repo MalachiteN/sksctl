@@ -93,7 +93,7 @@ for i in `seq 1 $(( (r - l) / p ))` ;do
 	cur=$((cur+p))
 	cnt=`sqlite3 $db 'SELECT COUNT(1) FROM LOGIN WHERE ACCESS > '$((cur-p))' AND ACCESS < '$cur`
 	if [[ ! -z $v ]] ;then
-		sqlite3 $db -box 'SELECT * FROM LOGIN WHERE ACCESS > '$((cur-p))' AND ACCESS < '$cur' ORDER BY ACCESS'
+		sqlite3 $db -box 'SELECT MAC,ACCESS_STR AS Access_Time FROM LOGIN WHERE ACCESS > '$((cur-p))' AND ACCESS < '$cur' ORDER BY ACCESS'
 	fi
 	pbar
 done

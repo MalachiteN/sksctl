@@ -40,7 +40,7 @@ if [[ $2 == '' ]] ;then
 	echo '参数 MAC 缺失'
 	fhelp
 fi
-url='http://1.1.1.1/cgi-bin/sgw_cgi/cgi_add_user_auth_bw.sh?s='$(date +%s%3N)'&bw_type='$type'&mac='${2^^}'&intf='
+url='http://10.72.174.2/cgi-bin/sgw_cgi/cgi_add_user_auth_bw.sh?s='$(date +%s%3N)'&bw_type='$type'&mac='${2^^}'&intf='
 echo '请求地址: '$url'[0-8]'
 read -r -p '设备'$2'将被加入'$color'名单。确定继续吗？[Y/n] ' yn
 case $yn in

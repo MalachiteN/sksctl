@@ -6,6 +6,7 @@ fhelp() {
     echo "	-s SIZE:	请求获取的数据条目数，默认为 10"
     echo "	-5:		输出服务器返回的用户密码 MD5，无论本地字典能否查到对应密码"
     echo "	-h:		显示帮助"
+    echo '本程序调用子命令 bindinfo, 但 bindinfo 还具有更多功能，参见 sksctl bindinfo -h'
     exit
 }
 url='http://'$ACIP'/cgi-bin/sgw_cgi/cgi_list_auth_mgmt.sh?s='`date +%s%3N`'&page_number=1&page_size='

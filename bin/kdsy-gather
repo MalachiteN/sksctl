@@ -2,7 +2,7 @@
 
 help() {
 	echo 'sksctl gather [OPTIONS]'
-	echo '从网关下载最近一天绕过验证登录的数据保存至本地 SQLite 数据库，供将来进行一些分析'
+	echo '从网关下载最近一天绕过验证登录(多半是其他同学)的数据保存至本地 SQLite 数据库，供将来进行一些分析'
 	echo 'OPTIONS:'
 	echo '	-f FILE:	指定数据库文件，默认为 '$KDSY'/kdsy.db'
 	echo '	-h:		显示帮助信息'

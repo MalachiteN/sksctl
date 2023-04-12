@@ -16,9 +16,8 @@ while getopts 'iuh' opt ;do
 			termux-change-repo
 			pkg upgrade
 			pkg ins vim sqlite crontab termux-services runit
-			usrname=`whoami`
 			mkdir -p $PREFIX/var/spool/cron/
-			cp ./crontab.rc $PREFIX/var/spool/cron/$usrname
+			cp ./crontab.rc $PREFIX/var/spool/cron/`whoami`
 			upd=true
 		;;
 		u) upd=true ;;

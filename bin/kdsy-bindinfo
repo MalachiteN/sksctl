@@ -6,6 +6,8 @@ fhelp() {
     echo "	-t account|mac|name:	查询类别，默认为用户姓名"
     echo "	-s SIZE:		请求获取的数据条目数，默认为 3（一般每个用户的设备数上限即为 3 ）"
     echo "	-h:			显示帮助"
+    echo '子命令 usrinfo 是通过 account 类别进行的查询。这只对于教师、食堂职工、物业员工有用。'
+    echo '查询其他设备请使用查询类别 mac。'
     exit
 }
 url='http://'$ACIP'/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0'

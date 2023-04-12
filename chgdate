@@ -1,0 +1,16 @@
+#!/bin/bash
+s=`date -r $1`
+declare -A wkday=(['Mon']='一' ['Tue']='二' ['Wed']='三' ['Thu']='四' ['Fri']='五' ['Sat']='六' ['Sun']='日')
+declare -A mth=(['Jan']='1' ['Feb']='2' ['Mar']='3' ['Apr']='4' ['May']='5' ['Jun']='6' ['Jul']='7 '['Apr']='8' ['Sep']='9' ['Oct']='10' ['Nov']='11' ['Dec']='12')
+i=1
+for item in $s ;do
+	l[$i]=$item
+	((i++))
+done
+m=${l[2]}
+d=${l[1]}
+echo -n ${l[6]}'年'
+echo -n ${mth[$m]}'月'
+echo -n ${l[3]}'日 星期'
+echo -n ${wkday[$d]}
+echo ' '${l[4]}

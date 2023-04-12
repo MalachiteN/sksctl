@@ -12,12 +12,10 @@ h=`date -Ih |sed -e's/^.*T//' -e's/+.*$//'`
 if ((h < 7)) ;then
 	echo '此时没有必要收集'
 	exit
-elif ((h == 7)) ;then
-	sz=300
+elif ((h == 11)) ;then
+	sz=220
 fi
 
 echo -e '\e[33m=== === ===		BEGIN		=== === ===\e[0m'
-echo `date`
 kdsy-gather -s $sz
-echo `date`
 echo -e '\e[33m=== === ===		END		=== === ===\e[0m\n'

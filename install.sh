@@ -2,7 +2,7 @@
 #!/bin/bash
 fhelp() {
     echo "./install.sh [OPTIONS]"
-    echo "安装或更新 kdsy 校园网 CLI 组件"
+    echo "安装或更新高新西区校园网 CLI 组件"
     echo "OPTIONS:"
     echo "	-i:	初始化（initial）安装，通常用于全新安装"
     echo -e "		\e[31m命令为 termux 定制，若非 termux 环境，将会报错退出\e[0m"
@@ -34,7 +34,9 @@ linenum=`grep -c KDSY ~/.profile`
 if [[ $linenum == 0 ]] ;then
 	echo 'export KDSY=~/.local/share/kdsy' >> ~/.profile
 	echo 'export PATH=$PATH:$KDSY' >> ~/.profile
+	echo 'export ACIP=1.1.1.1' >> ~/.profile
 	echo -e '\e[33m设定了环境变量。安装结束后请手动执行 source ~/.profile\e[0m'
+	echo -e '\e[33m对于用于不同学校或使用传送锚点导致工具不能工作的情况，请将 .profile 中的 1.1.1.1 自行改为自己设备 WiFi 设置中看到的网关 IP\e[0m'
 	source ~/.profile
 fi
 if [ -d $KDSY ] ;then

@@ -27,7 +27,7 @@ if [[ -z $mac ]] ;then
 	fi
 fi
 rip=`ifconfig|grep -A1 wlan0|sed -ne's/netmask.*//' -e's/[ ]*inet[ ]//' -e'2p'`
-redirected=`curl -Ls -o /dev/null -w %{url_effective} http://10.72.174.2`
+redirected=`curl -Ls -o /dev/null -w %{url_effective} 'http://'$ACIP`
 echo 'MAC:	'$mac
 echo '设备IP:	'$rip
 echo '重定向:	'$redirected
@@ -37,8 +37,8 @@ if [[ $redirected =~ login.html ]] ;then
 fi
 # QRCODE = 1 WECHAT1 = 4 WECHAT2 = 5 ONE_KEY = 6
 md5pwd=e10adc3949ba59abbe56e057f20f883e
-sPageURL='ssid_index=1&portal_id=7&acip=10.72.174.2&userip='$rip'&usermac='$mac'&iwgmac=04:8b:42:10:c6:20'
-sPageURL='ssid_index=1&portal_id=7&acip=10.72.174.2&userip='$rip'&usermac='$mac'&iwgmac=04:8b:42:10:c6:20'
-url="http://10.72.174.2:8081/app?web&username=sks&password="$md5pwd"&"$sPageURL"&portal_type=6"
-url="http://10.72.174.2:8081/app?web&username=sks&password="$md5pwd"&"$sPageURL"&portal_type=6"
+sPageURL='ssid_index=1&portal_id=7&acip='$ACIP'&userip='$rip'&usermac='$mac'&iwgmac=04:8b:42:10:c6:20'
+sPageURL='ssid_index=1&portal_id=7&acip='$ACIP'&userip='$rip'&usermac='$mac'&iwgmac=04:8b:42:10:c6:20'
+url="http://'$ACIP':8081/app?web&username=sks&password="$md5pwd"&"$sPageURL"&portal_type=6"
+url="http://'$ACIP':8081/app?web&username=sks&password="$md5pwd"&"$sPageURL"&portal_type=6"
 echo 'URL:	'$url

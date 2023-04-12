@@ -130,7 +130,7 @@ if [[ ! -z $b ]] ;then
 	exit
 fi
 
-url='http://10.72.174.2/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0&user=sks&page_size='$s
+url='http://'$ACIP'/cgi-bin/sgw_cgi/cgi_list_user_auth.sh?s='$(date +%s%3N)'&page_number=1&net_intf=0&user=sks&page_size='$s
 echo 'URL: '$url
 result=`curl -sL $url|sed '1,/<row>/d'|grep 'mac\|ip\|access\|expire'|sed 's/[[:space:]]*<[^<]*>//g'`
 

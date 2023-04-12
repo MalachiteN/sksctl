@@ -1,7 +1,7 @@
 #!/bin/bash
 
 fhelp() {
-	echo 'kdsy-connect [OPTIONS]'
+	echo 'sksctl connect [OPTIONS]'
 	echo '连接网络'
 	echo -e '\e[1mOPTIONS:\e[0m'
 	echo '	-m MAC:	提供用于登录的MAC'
@@ -18,12 +18,12 @@ while getopts 'm:h' opt ;do
 done
 
 if [[ -z $mac ]] ;then
-	if [[ ! -f $KDSY/ip.rc ]] ;then
+	if [[ ! -f $KDSY/mac.conf ]] ;then
 		echo '首次使用，正在生成随机MAC'
 		mac=`ifconfig|grep -A3 wlan0|sed -ne's/tx.*//' -e's/[ ]*ether[ ]//' -e's/.\{11\}$//' -e'4p'``xxd -p -l 3 < /dev/random|sed -e's/../:&/g'`
-		echo -n $mac > $KDSY/ip.rc
+		echo -n $mac > $KDSY/mac.conf
 	else
-		mac=`cat $KDSY/ip.rc`
+		mac=`cat $KDSY/mac.conf`
 	fi
 fi
 rip=`ifconfig|grep -A1 wlan0|sed -ne's/netmask.*//' -e's/[ ]*inet[ ]//' -e'2p'`
@@ -37,8 +37,6 @@ if [[ $redirected =~ login.html ]] ;then
 fi
 # QRCODE = 1 WECHAT1 = 4 WECHAT2 = 5 ONE_KEY = 6
 md5pwd=e10adc3949ba59abbe56e057f20f883e
-sPageURL='ssid_index=1&portal_id=7&acip='$ACIP'&userip='$rip'&usermac='$mac'&iwgmac=04:8b:42:10:c6:20'
-sPageURL='ssid_index=1&portal_id=7&acip='$ACIP'&userip='$rip'&usermac='$mac'&iwgmac=04:8b:42:10:c6:20'
-url="http://'$ACIP':8081/app?web&username=sks&password="$md5pwd"&"$sPageURL"&portal_type=6"
-url="http://'$ACIP':8081/app?web&username=sks&password="$md5pwd"&"$sPageURL"&portal_type=6"
+sPageURL='ssid_index=1&portal_id=7&acip='$ACIP'&userip='$rip'&usermac='$mac'&iwgmac='$ACMAC
+url='http://'$ACIP':8081/app?web&username=sks&password='$md5pwd'&'$sPageURL'&portal_type=6'
 echo 'URL:	'$url

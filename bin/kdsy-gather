@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 help() {
-	echo 'kdsy-gather [OPTIONS]'
+	echo 'sksctl gather [OPTIONS]'
 	echo '从网关下载最近一天绕过验证登录的数据保存至本地 SQLite 数据库，供将来进行一些分析'
 	echo 'OPTIONS:'
 	echo '	-f FILE:	指定数据库文件，默认为 '$KDSY'/kdsy.db'
@@ -105,7 +105,7 @@ summ() {
 	if [[ $1 == 'updated' ]] ;then
 		echo '更新完成'
 	elif [[ $1 == 'update' ]] ;then
-		echo '开始更新本地记录, 上次更新时间: '`chgdate $KDSY/kdsy.db`
+		echo '开始更新本地记录, 上次更新时间: '`$KDSY/bin/chgdate $KDSY/kdsy.db`
 	else
 		echo -n '' #pass
 	fi

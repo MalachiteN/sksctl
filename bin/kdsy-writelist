@@ -1,6 +1,6 @@
 #!/bin/bash
 fhelp() {
-    echo "kdsy-writelist [OPTIONS] B|W MAC"
+    echo "sksctl writelist [OPTIONS] B|W MAC"
     echo "将某个由MAC指定的设备加入黑/白名单"
     echo "OPTIONS:"
     echo "-i:	写入名单的模板编号。"

@@ -1,6 +1,6 @@
 #!/bin/bash
 help() {
-	echo 'kdsy-stat [OPTIONS]'
+	echo 'sksctl stat [OPTIONS]'
 	echo '从本地数据库中读取登录数据并生成统计图'
 	echo -e '\e[1mOPTIONS:\e[0m'
 	echo '	-f:	指定本地数据库文件，不指定则使用默认数据库'
@@ -8,7 +8,7 @@ help() {
 	echo '	-p:	指定时间区间长度，单位为秒'
 	echo '	-m:	指定用于显示条形图的单位长度'
 	echo '	-v:	verbose (详细模式)，将输出额外信息和每个区间的登录用户统计表'
-	echo '本程序不会向云端发起请求，因此可能缺失最新数据，请运行 kdsy-gather 手动更新。'
+	echo '本程序不会向云端发起请求，因此可能缺失最新数据，请运行 sksctl gather 手动更新。'
 	exit
 }
 
@@ -30,7 +30,7 @@ if [[ -z $db ]] ;then
 	db=$KDSY/kdsy.db
 fi
 if [[ ! -f $db ]] ;then
-	echo -e '\e[31m数据库不存在，请先运行 kdsy-gather 初始化数据库并收集信息\e[0m'
+	echo -e '\e[31m数据库不存在，请先运行 sksctl gather 初始化数据库并收集信息\e[0m'
 	exit
 fi
 

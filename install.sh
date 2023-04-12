@@ -1,4 +1,3 @@
-
 #!/bin/bash
 fhelp() {
     echo "./install.sh [OPTIONS]"
@@ -31,12 +30,14 @@ if [[ $upd != true ]] ;then
 	fhelp
 fi
 linenum=`grep -c KDSY ~/.profile`
+ac=`ip route show table all|grep '^default'|cut -d' ' -f3`
+ac_mac=`arp $ac|grep $ac|sed 's/\s\+/\t/g'|cut -f3`
 if [[ $linenum == 0 ]] ;then
 	echo 'export KDSY=~/.local/share/kdsy' >> ~/.profile
 	echo 'export PATH=$PATH:$KDSY' >> ~/.profile
-	echo 'export ACIP=1.1.1.1' >> ~/.profile
+	echo 'export ACIP='"'"$ac"'" >> ~/.profile
+	echo 'export ACMAC='"'"$ac_mac"'" >> ~/.profile
 	echo -e '\e[33m设定了环境变量。安装结束后请手动执行 source ~/.profile\e[0m'
-	echo -e '\e[33m对于用于不同学校或使用传送锚点导致工具不能工作的情况，请将 .profile 中的 1.1.1.1 自行改为自己设备 WiFi 设置中看到的网关 IP\e[0m'
 	source ~/.profile
 fi
 if [ -d $KDSY ] ;then
@@ -44,5 +45,5 @@ if [ -d $KDSY ] ;then
 	rm -r $KDSY
 fi
 mkdir -p $KDSY
-cp ./* $KDSY
+cp -r ./* $KDSY
 ls -s $KDSY

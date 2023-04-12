@@ -1,0 +1,3 @@
+#!/bin/bash
+echo '现在 kdsy 命令实际上执行了 sksctl'
+sksctl $@

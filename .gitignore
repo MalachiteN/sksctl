@@ -1,4 +1,4 @@
 *.txt
 *.db
 *.log
-*.rc
+*.conf

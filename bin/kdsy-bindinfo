@@ -1,6 +1,6 @@
 #!/bin/bash
 fhelp() {
-	echo "kdsy-bindinfo [OPTIONS] ACCOUNT|MAC|USER_NAME"
+	echo "sksctl bindinfo [OPTIONS] ACCOUNT|MAC|USER_NAME"
     echo "查询某个账号/设备MAC/用户姓名的设备绑定信息"
     echo "OPTIONS:"
     echo "	-t account|mac|name:	查询类别，默认为用户姓名"

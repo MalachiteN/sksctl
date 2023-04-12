@@ -3,7 +3,6 @@
 fhelp() {
 	echo 'sksctl SUBCOMMAND [ARGS]'
 	echo '高新西区校园网CLI套件'
-	echo ''
 	echo 'SUBCOMMAND'
 	echo '	help		显示本帮助'
 	echo '	usrinfo		查询用户账号信息'

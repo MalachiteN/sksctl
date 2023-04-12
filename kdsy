@@ -1,3 +1,5 @@
 #!/bin/bash
-echo '现在 kdsy 命令实际上执行了 sksctl'
+echo -e '\e[32m注意: 这是一个使用特定于科大实验的环境变量的运行方式\e[0m'
+ACIP='10.72.174.2'
+ACMAC='04:8b:42:10:c6:20'
 sksctl $@

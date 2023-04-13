@@ -22,7 +22,7 @@ The maintainer **DIDN'T** declared she ISN'T a catgirl. You **ARE SUPPOSED TO** 
 
 # Description
 
-This project is a tool automatically exploits the **public** APIs of SKS's Smart Multi-service Gateway (widely used in schools' public wireless network).
+This project is a tool automatically exploits the **public** APIs of SKS's Smart Multi-service Gateway (widely used in schools' public wireless network, for example in [this list](http://www.skspruce.com.cn/news/10/) ).
 
 Depending on what API it sends HTTP requests to, it can do many things, including:
 

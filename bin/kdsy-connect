@@ -33,10 +33,13 @@ echo '设备IP:	'$rip
 echo '重定向:	'$redirected
 if [[ $redirected =~ login.html ]] ;then
 	echo '本设备已登录成功'
-	#exit #DEBUG
+	exit #DEBUG
 fi
 # QRCODE = 1 WECHAT1 = 4 WECHAT2 = 5 ONE_KEY = 6
 md5pwd=e10adc3949ba59abbe56e057f20f883e
 sPageURL='ssid_index=1&portal_id=7&acip='$ACIP'&userip='$rip'&usermac='$mac'&iwgmac='$ACMAC
 url='http://'$ACIP':8081/app?web&username=sks&password='$md5pwd'&'$sPageURL'&portal_type=6'
 echo 'URL:	'$url
+result=`curl -Ls $url`
+# DEBUG
+echo $result

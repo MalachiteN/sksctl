@@ -13,11 +13,34 @@ It **ISN'T** designed for:
 - Stealing anyone's account;
 - Preventing anyone from binding he/her's new device to he/her's account;
 - Banning any device from using campus network;
+
 Or any other toxic things like them.
 
 Users **SHOULDN'T** use these scripts to do anything harmful. We contributors **AREN'T** responsible to any abusers.
 
 The maintainer **DIDN'T** declared she ISN'T a catgirl. You **ARE SUPPOSED TO** caress her ears.
+
+# Description
+
+This project is a tool automatically exploits the **public** APIs of SKS's Smart Multi-service Gateway (widely used in schools' public wireless network).
+
+Depending on what API it sends HTTP requests to, it can do many things, including:
+
+- [x] Automatically connects your devices to internet;
+- [x] Prevents your device from being banned by teachers;
+- [x] Uses spare accounts to register your device permanently;
+- [x] Automatically records your schoolmates' login activity and making statistics;
+
+_And so on..._
+
+There's also a lot of functions haven't been implemented yet:
+
+- [] Creates your own account, and delete it after using for safety;
+- [] Manipulates the login portal, like reseting banned ones, or changing their login methods;
+
+...
+
+Actually the maintainer doesn't know why such vital APIs could be exposed to the public without any authentication. However, exposed they are, we can make use of them.
 
 # Environment
 
@@ -37,34 +60,34 @@ They should be installed from the same source, or the last 2 plugins won't be in
 
 # Install
 
-Anyway we should clone this repo, or you can fork me and clone your.
+## Select the fastest mirror
 
-```shell
-git clone git@github.com:MalachiteN/sksctl.git
-cd sksctl
-```
-
-## Installer script
-
-We have a automatic installer script. However, it is not fully tested. Pull requests are welcomed.
-
-```shell
-# chmod +x install.sh if required
-./install.sh -i
-source ~/.profile
-```
-
-## Manual install
-
-### Choose a Termux package repository mirror close to you.
+Before installing `git`, you can choose a Termux package repository mirror close to you for higher download speed.
 
 ```shell
 termux-change-repo
 ```
 
+If you have this done before, you can skip this step. Instead, you will need `apt update`.
+
+## Clone this repo
+
+`git` is the tool to clone this repository to your device. If it isn't installed, install it.
+
+```shell
+apt install git
+```
+
+Anyway we should clone this repo, or you can fork mine and clone your.
+
+```shell
+git clone https://github.com/MalachiteN/sksctl.git
+cd sksctl
+```
+
 This command automatically runs `apt update`, thus your package manager cache will be up to date.
 
-If you have this done before, you can skip this step. Instead, you will need `apt update`.
+## Manually install
 
 ### Install dependencies
 
@@ -76,8 +99,9 @@ apt install vim sqlite iproute2 crontab termux-services runit
 - `sqlite` provides us the ability of managing gathered information about students' login activity;
 - For getting the IP and MAC address of your gateway, we need `iproute2`, which provides command `ip`.
 - the last three ones are related to automatic information gathering.
+This command automatically runs `apt update`, thus your package manager cache will be up to date.
 
-### Perform the installation
+### Copy files and change permissions
 
 Now the installation directory **MUST** be `~/.local/share/kdsy`, or some functions (especially automatic information gathering) won't work.
 
@@ -113,7 +137,23 @@ echo 'export ACMAC='"'"$ac_mac"'" >> ~/.profile
 source ~/.profile
 ```
 
-### Finish! 😋
+## Use the installer script
+
+Besides installing it manually, we have a automatic installer script.
+
+**However, it is not fully tested. Pull requests are welcomed.**
+
+```shell
+# chmod +x install.sh if required
+./install.sh -i
+source ~/.profile
+```
+
+That's simple but could cause serious problems to your Termux environment. Use it carefully.
+
+As soon as the installer script comes stable, we'll set it the recommended method for installation.
+
+## Finish! 😋
 
 `sksctl` should work now. Type `sksctl` and some subcommands to test if it is installed properly.
 
@@ -137,10 +177,23 @@ In fact, `crontab` and the job schedule is set during the install procedure. How
 
 Of course you can manually start `crond`, or run it on login (for example to use `.profile`). But this isn't the best way.
 
-Don't forget Termux had given us a plugin mentioned called `Termux:Boot`. Once installed in your Android system, it will run a batch of scripts in `$HOME/.termux/boot/` when your Android boots.
+Don't forget Termux had given us a plugin mentioned called `Termux:Boot`. Once installed, it will run a batch of scripts in `$HOME/.termux/boot/` when your Android boots.
 
 ```shell
 mkdir -p ~/.termux/boot
 echo -e 'termux-wake-lock\ncrond' > ~/.termux/boot/cron.sh
 chmod +x ~/.termux/boot/cron.sh
 ```
+
+# Help us
+
+Our project needs your help! We'll appreciate you if you can do these for us:
+
+## Installer script testing
+
+If you have a clean Docker container or a spare Android device, you can help us to test our installer script.
+
+## Test (and/or port, if necessary) it for your school
+
+If you're attending a school in [this list](http://www.skspruce.com.cn/news/10/), you can test whether `sksctl` works in your school's public wireless network.
+If it doesn't work but you have a solution, opening your branch and port our script to your school is welcomed, and beneficial to both you, your schoolmates, and of course our project.

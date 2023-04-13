@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/data/data/com.termux/files/usr/bin/bash
+
 s=`date -r $1`
 declare -A wkday=(['Mon']='一' ['Tue']='二' ['Wed']='三' ['Thu']='四' ['Fri']='五' ['Sat']='六' ['Sun']='日')
 declare -A mth=(['Jan']='1' ['Feb']='2' ['Mar']='3' ['Apr']='4' ['May']='5' ['Jun']='6' ['Jul']='7 '['Apr']='8' ['Sep']='9' ['Oct']='10' ['Nov']='11' ['Dec']='12')

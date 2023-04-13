@@ -35,8 +35,8 @@ _And so on..._
 
 There's also a lot of functions haven't been implemented yet:
 
-- [] Creates your own account, and delete it after using for safety;
-- [] Manipulates the login portal, like reseting banned ones, or changing their login methods;
+- [ ] Creates your own account, and delete it after using for safety;
+- [ ] Manipulates the login portal, like reseting banned ones, or changing their login methods;
 
 ...
 

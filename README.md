@@ -22,7 +22,7 @@ The maintainer **DIDN'T** declared she ISN'T a catgirl. You **ARE SUPPOSED TO** 
 # Environment
 
 > Notice: This set of scripts **IS ONLY** designed for [Termux](https://github.com/termux/termux-app). Don't ask why it doesn't run on your _manylinux_ machines. 
-
+>
 > If you're determined to do this, you may try to run a [Termux container in Docker](https://github.com/termux/termux-docker). This way is officially supported by Termux team. We won't officially support it or any manylinux system in our plan NOW.
 
 Install this Apps from [F-DROID](https://f-droid.org/):
@@ -75,19 +75,19 @@ apt install vim sqlite iproute2 crontab termux-services runit
 - `vim` is for command `xxd`, which plays a significant role in both generating random MAC and encodeURI;
 - `sqlite` provides us the ability of managing gathered information about students' login activity;
 - For getting the IP and MAC address of your gateway, we need `iproute2`, which provides command `ip`.
-- the last three ones are related to auto information gathering.
+- the last three ones are related to automatic information gathering.
 
 ### Perform the installation
 
 Now the installation directory **MUST** be `~/.local/share/kdsy`, or some functions (especially automatic information gathering) won't work.
 
 > It is because the script is once named `kdsy`, the name of the maintainer's school.
-
+>
 > Now, you can still call `kdsy` as a special alias of `sksctl` with specified environment variables.
 
 ```shell
 insdir='~/.local/share/kdsy'
-crondir='$PREFIX/var/spool/cron/'
+crondir=$PREFIX'/var/spool/cron/'
 mkdir -p $crondir
 mkdir -p $insdir
 cp -r . $insdir
@@ -109,6 +109,8 @@ echo 'export KDSY=~/.local/share/kdsy' >> ~/.profile
 echo 'export PATH=$PATH:$KDSY' >> ~/.profile
 echo 'export ACIP='"'"$ac"'" >> ~/.profile
 echo 'export ACMAC='"'"$ac_mac"'" >> ~/.profile
+# Don't afraid to forget how to exit vim! >w<
+source ~/.profile
 ```
 
 ### Finish! 😋
@@ -123,22 +125,22 @@ If you want to set up the automatic information gathering function, check sectio
 sksctl help
 ```
 
-You may be not familar to Linux CLI. Don't panic, clam down, try to find out how to use our tools yourself.
+You may be not familar to Linux CLI. Don't panic, clam down, and try to find out how to use our tools yourself.
 
 the only tip here is `sksctl help`. QwQ
 
 # Setting up crontab
+
 Automatic infomation gathering needs this step.
 
 In fact, `crontab` and the job schedule is set during the install procedure. However, in Termux, `crond`(the daemon of crontab) needs a bit help to be started.
 
 Of course you can manually start `crond`, or run it on login (for example to use `.profile`). But this isn't the best way.
 
-Don't forget Termux had given us a plugin mentioned called `Termux Boot`. Once installed in your Android system, it will run a batch of scripts in `$HOME/.termux/boot/` when your Android boots.
+Don't forget Termux had given us a plugin mentioned called `Termux:Boot`. Once installed in your Android system, it will run a batch of scripts in `$HOME/.termux/boot/` when your Android boots.
 
 ```shell
 mkdir -p ~/.termux/boot
 echo -e 'termux-wake-lock\ncrond' > ~/.termux/boot/cron.sh
-# Don't afraid to forget how to exit vim! >w<
 chmod +x ~/.termux/boot/cron.sh
 ```

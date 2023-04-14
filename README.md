@@ -2,6 +2,8 @@
 
 A CLI Tool for a campus network somewhere
 
+English | [中文版](https://github.com/MalachiteN/sksctl/blob/main/README_CN.md)
+
 ---
 
 # DISCLAIMER

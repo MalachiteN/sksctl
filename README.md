@@ -11,7 +11,7 @@ This project is designed for **the only purpose of studying skills of reverse en
 It **ISN'T** designed for:
 - Cracking into any system;
 - Stealing anyone's account;
-- Preventing anyone from binding he/her's new device to he/her's account;
+- Preventing anyone from binding his/her new device to his/her account;
 - Banning any device from using campus network;
 
 Or any other toxic things like them.
@@ -62,11 +62,12 @@ They should be installed from the same source, or the last 2 plugins won't be in
 
 ## Select the fastest mirror
 
-Before installing `git`, you can choose a Termux package repository mirror close to you for higher download speed.
+Before installing `git` and/or install our tools, you can choose a Termux package repository mirror close to you for higher download speed.
 
 ```shell
 termux-change-repo
 ```
+This command automatically runs `apt update`, thus your package manager cache will be up to date.
 
 If you have this done before, you can skip this step. Instead, you will need `apt update`.
 
@@ -85,8 +86,6 @@ git clone https://github.com/MalachiteN/sksctl.git
 cd sksctl
 ```
 
-This command automatically runs `apt update`, thus your package manager cache will be up to date.
-
 ## Manually install
 
 ### Install dependencies
@@ -99,7 +98,6 @@ apt install vim sqlite iproute2 crontab termux-services runit
 - `sqlite` provides us the ability of managing gathered information about students' login activity;
 - For getting the IP and MAC address of your gateway, we need `iproute2`, which provides command `ip`.
 - the last three ones are related to automatic information gathering.
-This command automatically runs `apt update`, thus your package manager cache will be up to date.
 
 ### Copy files and change permissions
 
@@ -141,7 +139,7 @@ source ~/.profile
 
 Besides installing it manually, we have a automatic installer script.
 
-**However, it is not fully tested. Pull requests are welcomed.**
+**However, it is not completed and is full of errors. Pull requests are welcomed.**
 
 ```shell
 # chmod +x install.sh if required
@@ -149,7 +147,7 @@ Besides installing it manually, we have a automatic installer script.
 source ~/.profile
 ```
 
-That's simple but could cause serious problems to your Termux environment. Use it carefully.
+It will be simple but now it causes serious problems to your Termux environment. **Don't use it!**
 
 As soon as the installer script comes stable, we'll set it the recommended method for installation.
 

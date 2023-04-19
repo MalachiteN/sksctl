@@ -170,7 +170,7 @@ the only tip here is `sksctl help`. QwQ
 
 # Setting up crontab
 
-Automatic infomation gathering needs this step. This function can't be enabled unless you are `root`.
+Automatic infomation gathering needs this step.
 
 In Linux, the program `Cron` executes commands we scheduled. The time table is called `crontab`. We use `crontab -e` to edit our task schedule.
 
@@ -179,7 +179,7 @@ In Termux, we need to install it manually. It belongs to the source `root-repo`.
 ```shell
 apt install root-repo
 apt update
-apt install termux-service runit crontab
+apt install termux-service runit cronie
 ```
 
 Then, copy our preset crontab to your Cron's directory.

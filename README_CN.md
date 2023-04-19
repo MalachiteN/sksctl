@@ -173,7 +173,7 @@ sksctl help
 
 # 设置crontab
 
-自动信息收集功能需要这个步骤。你只有在获取 root 之后才能启用这个功能。
+自动信息收集功能需要这个步骤。
 
 在Linux中，程序`Cron`执行我们安排的命令。时间表被称为`crontab`。我们使用`crontab -e`来编辑我们的任务时间表。
 
@@ -182,7 +182,7 @@ sksctl help
 ```shell
 apt install root-repo
 apt update
-apt install termux-service runit crontab
+apt install termux-service runit cronie
 ```
 
 无需人工输入时间表。把预设的crontab复制到你的Cron配置目录。

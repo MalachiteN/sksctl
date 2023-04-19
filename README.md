@@ -89,17 +89,32 @@ git clone https://github.com/MalachiteN/sksctl.git
 cd sksctl
 ```
 
+## Use the installer script
+
+We have a automatic installer script, simplifying our installing process.**However, it is not completed yet, and may cause some errors. Pull requests are welcomed.**
+
+```shell
+# chmod +x install.sh if required
+./install.sh -i
+source ~/.profile
+```
+
+It is tested in Termux and Kali container in it. As soon as the installer script comes stable, we'll set it the recommended method for installation.
+
 ## Manually install
+
+If the installer script doesn't work, you can fallback to this way.
 
 ### Install dependencies
 
 ```shell
-apt install vim sqlite iproute2
+apt install vim sqlite3 iproute2 curl
 ```
 
 - We need `vim` for the command `xxd`, which plays a significant role in both generating random MAC and encodeURI;
-- `sqlite` provides us the ability of managing gathered information about students' login activity;
+- `sqlite3` provides us the ability of managing gathered information about students' login activity;
 - In order to get the IP and MAC address of your gateway, we need `iproute2`, which provides command `ip`.
+- Most Linux distributions, as well as Termux, has `curl`. However, some containers doesn't. In the case we need to install it manually.
 
 ### Copy files and change permissions
 
@@ -135,22 +150,6 @@ echo 'export ACMAC='"'"$ac_mac"'" >> ~/.profile
 # Don't afraid to forget how to exit vim! >w<
 source ~/.profile
 ```
-
-## Use the installer script
-
-Besides installing it manually, we have a automatic installer script.
-
-**However, it is not completed and is full of errors. Pull requests are welcomed.**
-
-```shell
-# chmod +x install.sh if required
-./install.sh -i
-source ~/.profile
-```
-
-It will be simple but now it causes serious problems to your Termux environment. **Don't use it!**
-
-As soon as the installer script comes stable, we'll set it the recommended method for installation.
 
 ## Finish! 😋
 

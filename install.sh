@@ -12,9 +12,11 @@ fhelp() {
 while getopts 'iuh' opt ;do
 	case $opt in
 		i)
-			termux-setup-storage
-			termux-change-repo
-			pkg ins vim sqlite iproute2
+			if [[ ! -z `which termux-setup-storage` ]] ;then
+				termux-setup-storage
+				termux-change-repo
+			fi
+			apt install vim sqlite3 iproute2 curl
 			upd=true
 		;;
 		u) upd=true ;;
@@ -28,6 +30,8 @@ fi
 linenum=`grep -c KDSY ~/.profile`
 ac=`ip route show table all|grep '^default'|cut -d' ' -f3`
 ac_mac=`arp $ac|grep $ac|sed 's/\s\+/\t/g'|cut -f3`
+echo 'AC IP: '$ac
+echo 'AC MAC: '$ac_mac
 if [[ $linenum == 0 ]] ;then
 	echo 'export KDSY=~/.local/share/kdsy' >> ~/.profile
 	echo 'export PATH=$PATH:$KDSY' >> ~/.profile
@@ -42,4 +46,5 @@ if [ -d $KDSY ] ;then
 fi
 mkdir -p $KDSY
 cp -r ./* $KDSY
-ls -s $KDSY
+chmod +x $KDSY/bin/* $KDSY/sksctl $KDSY/kdsy $KDSY/cron.sh
+ls -lsa $KDSY

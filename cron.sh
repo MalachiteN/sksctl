@@ -4,9 +4,10 @@ PREFIX=/data/data/com.termux/files/usr
 PATH=/data/data/com.termux/files/usr/bin
 MAILTO=root
 HOME=/data/data/com.termux/files/home
-
-source $HOME/.profile
-
+KDSY=$HOME/.local/share/kdsy
+PATH=$PATH:$KDSY
+ACIP='10.72.174.2'
+ACMAC='04:8b:42:10:c6:20'
 sz=60
 
 h=`date -Ih |sed -e's/^.*T//' -e's/+.*$//'`

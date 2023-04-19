@@ -22,7 +22,7 @@ if [[ -z $1 || $1 == 'help' ]] ;then
 elif [[ $1 == 'license' ]] ;then
 	cat $KDSY/LICENSE|less
 elif [[ $1 == 'logcat' ]] ;then
-	cat $KDSY/gather.log|less
+	cat $KDSY/gather.log
 else
 	f=$1; shift 1
 	$KDSY/bin/kdsy-$f $@

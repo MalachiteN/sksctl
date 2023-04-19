@@ -5,6 +5,5 @@ MAILTO=root
 HOME=/data/data/com.termux/files/home
 KDSY=$HOME/.local/share/kdsy
 PATH=$PATH:$KDSY
-#source $HOME/.profile
 
 */30 * * * * $KDSY/cron.sh >> $KDSY/gather.log

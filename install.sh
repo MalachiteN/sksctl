@@ -14,9 +14,7 @@ while getopts 'iuh' opt ;do
 		i)
 			termux-setup-storage
 			termux-change-repo
-			pkg ins vim sqlite crontab termux-services runit iproute2
-			mkdir -p $PREFIX/var/spool/cron/
-			cp ./crontab.rc $PREFIX/var/spool/cron/`whoami`
+			pkg ins vim sqlite iproute2
 			upd=true
 		;;
 		u) upd=true ;;

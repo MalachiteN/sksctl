@@ -54,9 +54,10 @@ Install this Apps from [F-DROID](https://f-droid.org/):
 
 - [Termux](https://f-droid.org/en/packages/com.termux)
 - [Termux:Styling](https://f-droid.org/en/packages/com.termux.styling)
-- [Termux:Boot](https://f-droid.org/en/packages/com.termux.boot)
 
-They should be installed from the same source, or the last 2 plugins won't be installed successfully due to wrong shared UID.
+The first is our terminal emulator, and the second is the styling plugin. If the font looks strange on your device (mostly caused by the absence of the monospace font), you'll need it.
+
+They should be installed from the same source, or the plugins won't be installed successfully due to wrong shared UID.
 
 > We DON'T KNOW whether UTermux or any other mess like it IS OR ISN'T compatible to sksctl. You should try it out yourself.
 
@@ -93,13 +94,12 @@ cd sksctl
 ### Install dependencies
 
 ```shell
-apt install vim sqlite iproute2 crontab termux-services runit
+apt install vim sqlite iproute2
 ```
 
-- `vim` is for command `xxd`, which plays a significant role in both generating random MAC and encodeURI;
+- We need `vim` for the command `xxd`, which plays a significant role in both generating random MAC and encodeURI;
 - `sqlite` provides us the ability of managing gathered information about students' login activity;
-- For getting the IP and MAC address of your gateway, we need `iproute2`, which provides command `ip`.
-- the last three ones are related to automatic information gathering.
+- In order to get the IP and MAC address of your gateway, we need `iproute2`, which provides command `ip`.
 
 ### Copy files and change permissions
 
@@ -116,11 +116,10 @@ mkdir -p $crondir
 mkdir -p $insdir
 cp -r . $insdir
 chmod +x $insdir/bin/*
-chmod +x $insdir/kdsy $insdir/sksctl $insdir/cron.sh
-cp ./crontab.rc $crondir/`whoami`
+chmod +x $insdir/kdsy
 ```
 
-Now it is installed, and if you're my schoolmate, you can run `kdsy` for testing.
+Now it is installed. If you're my schoolmate, you can run `kdsy` for testing.
 
 ### Configuring environment variables
 
@@ -171,18 +170,28 @@ the only tip here is `sksctl help`. QwQ
 
 # Setting up crontab
 
-Automatic infomation gathering needs this step.
+Automatic infomation gathering needs this step. This function can't be enabled unless you are `root`.
 
-In fact, `crontab` and the job schedule is set during the install procedure. However, in Termux, `crond`(the daemon of crontab) needs a bit help to be started.
+In Linux, the program `Cron` executes commands we scheduled. The time table is called `crontab`. We use `crontab -e` to edit our task schedule.
 
-Of course you can manually start `crond`, or run it on login (for example to use `.profile`). But this isn't the best way.
-
-Don't forget Termux had given us a plugin mentioned called `Termux:Boot`. Once installed, it will run a batch of scripts in `$HOME/.termux/boot/` when your Android boots.
+In Termux, we need to install it manually. It belongs to the source `root-repo`.
 
 ```shell
-mkdir -p ~/.termux/boot
-echo -e 'termux-wake-lock\ncrond' > ~/.termux/boot/cron.sh
-chmod +x ~/.termux/boot/cron.sh
+apt install root-repo
+apt update
+apt install termux-service runit crontab
+```
+
+Then, copy our preset crontab to your Cron's directory.
+
+```shell
+cp $KDSY/crontab.rc $PREFIX/var/spool/cron/`whoami`
+```
+
+Also, `crond`(the daemon of crontab) needs a little help to be started.
+
+```shell
+sv-enable crond
 ```
 
 # Help us

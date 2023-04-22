@@ -101,6 +101,8 @@ source ~/.profile
 
 It is tested in Termux and Kali container in it. As soon as the installer script comes stable, we'll set it the recommended method for installation.
 
+> **CAUTION: NOW IT'S BROKEN ON ALMOST ALL DEVICES OVER ANDROID 10, SO THEIR USERS SHOULD MANUALLY INSTALL THIS TOOL**
+
 ## Manually install
 
 If the installer script doesn't work, you can fallback to this way.
